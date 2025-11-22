@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Text Detector</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Serif+Libre:wght@300;400;700&family=Cutive+Mono&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,8 +15,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Cutive Mono', monospace;
+            background: #d4d4d4;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -22,114 +25,123 @@
         }
 
         .container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            background: #e8e8e8;
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
             max-width: 800px;
             width: 100%;
             padding: 40px;
         }
 
         h1 {
-            color: #333;
+            font-family: 'Averia Serif Libre', serif;
+            color: #000;
             margin-bottom: 10px;
-            font-size: 2.5em;
+            font-size: 3em;
+            font-weight: 700;
             text-align: center;
+            letter-spacing: -2px;
         }
 
         .subtitle {
-            color: #666;
+            color: #333;
             text-align: center;
             margin-bottom: 30px;
-            font-size: 1.1em;
+            font-size: 0.9em;
         }
 
         textarea {
             width: 100%;
             min-height: 200px;
             padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
+            border: 3px solid #000;
+            background: #fff;
+            font-size: 14px;
+            font-family: 'Cutive Mono', monospace;
             resize: vertical;
-            transition: border-color 0.3s;
         }
 
         textarea:focus {
             outline: none;
-            border-color: #667eea;
+            box-shadow: 4px 4px 0 #000;
         }
 
         .button-container {
             margin-top: 20px;
             display: flex;
-            gap: 10px;
+            gap: 15px;
         }
 
         button {
             flex: 1;
             padding: 15px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 400;
+            font-family: 'Cutive Mono', monospace;
+            border: 3px solid #000;
+            background: #fff;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.1s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .detect-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #000;
+            color: #fff;
         }
 
         .detect-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        .detect-btn:active:not(:disabled) {
+            transform: translate(0, 0);
+            box-shadow: 2px 2px 0 #000;
         }
 
         .detect-btn:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
         .clear-btn {
-            background: #f5f5f5;
-            color: #333;
+            background: #fff;
+            color: #000;
         }
 
         .clear-btn:hover {
-            background: #e0e0e0;
+            transform: translate(-2px, -2px);
+            box-shadow: 4px 4px 0 #000;
+        }
+
+        .clear-btn:active {
+            transform: translate(0, 0);
+            box-shadow: 2px 2px 0 #000;
         }
 
         .result {
             margin-top: 30px;
             padding: 25px;
-            border-radius: 8px;
+            border: 3px solid #000;
             display: none;
+            background: #fff;
         }
 
         .result.human {
-            background: #e8f5e9;
-            border: 2px solid #4caf50;
+            background: #b8b8b8;
         }
 
         .result.ai {
-            background: #fff3e0;
-            border: 2px solid #ff9800;
+            background: #a0a0a0;
         }
 
         .result h2 {
             margin-bottom: 15px;
             font-size: 1.5em;
-        }
-
-        .result.human h2 {
-            color: #2e7d32;
-        }
-
-        .result.ai h2 {
-            color: #e65100;
+            font-family: 'Averia Serif Libre', serif;
+            color: #000;
         }
 
         .probabilities {
@@ -142,14 +154,15 @@
         .metrics {
             margin-top: 20px;
             padding: 15px;
-            background: white;
-            border-radius: 8px;
+            background: #d4d4d4;
+            border: 3px solid #000;
         }
 
         .metrics h3 {
-            font-size: 1.1em;
+            font-size: 1em;
             margin-bottom: 10px;
-            color: #666;
+            color: #000;
+            font-family: 'Averia Serif Libre', serif;
         }
 
         .metric-grid {
@@ -160,55 +173,57 @@
 
         .metric-item {
             padding: 8px;
-            background: #f5f5f5;
-            border-radius: 4px;
+            background: #fff;
+            border: 2px solid #000;
         }
 
         .metric-label {
-            font-size: 0.85em;
-            color: #666;
+            font-size: 0.75em;
+            color: #000;
+            text-transform: uppercase;
         }
 
         .metric-value {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #333;
+            font-size: 1em;
+            font-weight: 400;
+            color: #000;
             margin-top: 3px;
         }
 
         .prob-card {
-            background: white;
+            background: #fff;
             padding: 15px;
-            border-radius: 8px;
+            border: 3px solid #000;
             text-align: center;
         }
 
         .prob-label {
-            font-size: 0.9em;
-            color: #666;
+            font-size: 0.8em;
+            color: #000;
             margin-bottom: 5px;
+            text-transform: uppercase;
         }
 
         .prob-value {
-            font-size: 2em;
-            font-weight: bold;
+            font-size: 2.5em;
+            font-weight: 400;
+            font-family: 'Averia Serif Libre', serif;
         }
 
         .result.human .prob-value.human {
-            color: #4caf50;
+            color: #000;
         }
 
         .result.ai .prob-value.ai {
-            color: #ff9800;
+            color: #000;
         }
 
         .error {
             margin-top: 20px;
             padding: 15px;
-            background: #ffebee;
-            border: 2px solid #f44336;
-            border-radius: 8px;
-            color: #c62828;
+            background: #fff;
+            border: 3px solid #000;
+            color: #000;
             display: none;
         }
 
@@ -216,13 +231,12 @@
             display: none;
             text-align: center;
             margin-top: 20px;
-            color: #667eea;
+            color: #000;
         }
 
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
+            border: 4px solid #d4d4d4;
+            border-top: 4px solid #000;
             width: 40px;
             height: 40px;
             animation: spin 1s linear infinite;
@@ -237,24 +251,24 @@
         .footer {
             margin-top: 30px;
             text-align: center;
-            color: #999;
-            font-size: 0.9em;
+            color: #000;
+            font-size: 0.8em;
         }
 
         .footer a {
-            color: #667eea;
-            text-decoration: none;
+            color: #000;
+            text-decoration: underline;
         }
 
         .footer a:hover {
-            text-decoration: underline;
+            text-decoration: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🤖 AI Text Detector</h1>
-        <p class="subtitle">Hybrid ML + Entropy Analysis for robust AI detection</p>
+        <p class="subtitle">Ensemble Analysis for robust AI detection</p>
 
         <textarea
             id="textInput"
