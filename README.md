@@ -107,13 +107,7 @@ conda activate verif
 
 # Install pre-commit hooks
 pre-commit install
-
-# Run the application
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for full development setup instructions.
-
 
 ## Model Information
 
@@ -126,49 +120,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full development setup instructions.
   - **Burstiness**: Sentence complexity variation (human writing varies more)
   - **Lexical Diversity**: Unique word ratio (type-token ratio)
 
-## Technical Details
-
-### Technology Stack
-
-- **Backend**: FastAPI (Python 3.11)
-- **ML Framework**: PyTorch + Transformers
-- **ML Model**: RoBERTa-base (ChatGPT detector)
-- **Perplexity Model**: GPT-2 (for entropy calculation)
-- **Entropy Analysis**: NumPy for statistical metrics
-- **Container**: Docker with multi-stage build
-- **Frontend**: Vanilla HTML/CSS/JavaScript
-
-### Resource Requirements
-
-- **RAM**: ~2GB minimum (for model loading)
-- **Disk**: ~2GB (for model cache)
-- **CPU**: Any modern CPU (GPU not required)
-
-### Performance
-
-- **First request**: 5-10 seconds (model loading)
-- **Subsequent requests**: <1 second
-- **Concurrent requests**: Supported (model is loaded once)
-
-## Stopping the Application
-
-```bash
-# If running with docker-compose
-docker-compose down
-
-# To also remove the model cache volume
-docker-compose down -v
-```
 
 ## Future Enhancements
 
 - [ ] Batch processing API endpoint
-- [ ] Confidence threshold settings
-- [ ] Text highlighting for AI-likely sections
-- [ ] Export results to PDF/CSV
 - [ ] API rate limiting
-- [ ] User authentication
-- [ ] Method refinement and white paper
+- [ ] User 2fa authentication
+- [ ] Method refinement
+- [ ] Deployment
+
 
 ## License
 
