@@ -114,30 +114,6 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full development setup instructions.
 
-### Project Structure
-
-```
-verif/
-├── app/
-│   ├── __init__.py
-│   ├── main.py              # FastAPI application
-│   ├── model.py             # BERT model wrapper
-│   └── static/
-│       └── index.html       # Web UI
-├── tests/
-│   ├── test_unit_model.py   # Unit tests
-│   └── test_e2e_docker.py   # E2E tests
-├── .github/
-│   └── workflows/
-│       └── ci.yml           # GitHub Actions CI/CD
-├── Dockerfile               # Docker image definition
-├── docker-compose.yml       # Docker Compose configuration
-├── environment.yml          # Conda dependencies
-├── .pre-commit-config.yaml  # Pre-commit hooks
-├── .dockerignore
-├── .gitignore
-└── README.md
-```
 
 ## Model Information
 
@@ -149,8 +125,6 @@ verif/
   - **Shannon Entropy**: Character-level randomness measure
   - **Burstiness**: Sentence complexity variation (human writing varies more)
   - **Lexical Diversity**: Unique word ratio (type-token ratio)
-- **Scoring**: 60% ML model + 40% entropy features
-- **Max Input Length**: 512 tokens
 
 ## Technical Details
 
@@ -186,20 +160,6 @@ docker-compose down
 docker-compose down -v
 ```
 
-## Troubleshooting
-
-### Model Download Issues
-
-If the model fails to download, check your internet connection. The first run downloads ~400MB from Hugging Face.
-
-### Port Already in Use
-
-If port 8000 is already in use, modify the port in `docker-compose.yml`:
-```yaml
-ports:
-  - "8001:8000"  # Change 8001 to any available port
-```
-
 ## Future Enhancements
 
 - [ ] Batch processing API endpoint
@@ -208,6 +168,7 @@ ports:
 - [ ] Export results to PDF/CSV
 - [ ] API rate limiting
 - [ ] User authentication
+- [ ] Method refinement and white paper
 
 ## License
 
