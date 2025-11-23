@@ -133,23 +133,3 @@ pre-commit install
 ## License
 
 MIT License - feel free to use this project for learning, development, or production.
-
-## Acknowledgments
-
-- ML Model: [ChatGPT Detector RoBERTa](https://huggingface.co/Hello-SimpleAI/chatgpt-detector-roberta) by Hello-SimpleAI
-- Perplexity Analysis: GPT-2 by OpenAI
-- Built with [FastAPI](https://fastapi.tiangolo.com/)
-- Powered by [Hugging Face Transformers](https://huggingface.co/transformers/)
-- Entropy-based detection inspired by information theory research
-
-## Contributing
-
-This is a learning/warmup project, but contributions are welcome! Feel free to:
-- Report bugs
-- Suggest features
-- Submit pull requests
-- Share your use cases
-
----
-
-**Note**: This detector identifies *style patterns* associated with AI writing. It should be used as one tool among many for academic integrity, not as definitive proof.
