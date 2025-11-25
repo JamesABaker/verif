@@ -17,7 +17,7 @@ COPY evaluation/evaluate.py .
 # Install dependencies with uv
 RUN uv venv && \
     . .venv/bin/activate && \
-    uv pip install --no-binary :all: torch --index-url https://download.pytorch.org/whl/cpu && \
+    uv pip install torch --index-url https://download.pytorch.org/whl/cpu && \
     uv pip install -e ".[eval]"
 
 # Set environment to use venv
