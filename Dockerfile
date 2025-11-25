@@ -11,10 +11,15 @@ WORKDIR /app
 COPY pyproject.toml .
 COPY app/ ./app/
 
+# Build arg to control PyTorch variant (cpu or cu118)
+ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu
+
 # Install dependencies with uv
 RUN uv venv && \
     . .venv/bin/activate && \
-    uv pip install -e .
+    uv pip install torch --index-url ${TORCH_INDEX_URL} && \
+    uv pip install -e . --no-deps && \
+    uv pip install transformers fastapi uvicorn pydantic python-multipart requests "numpy<2"
 
 # Set environment variables to use venv
 ENV PATH=/app/.venv/bin:$PATH

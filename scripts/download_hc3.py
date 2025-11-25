@@ -10,7 +10,7 @@ from pathlib import Path
 from datasets import load_dataset
 
 # Dataset cache directory (can be customized via HC3_CACHE_DIR env var)
-CACHE_DIR = Path(os.getenv("HC3_CACHE_DIR", "/data/hc3_dataset"))
+CACHE_DIR = Path(os.getenv("HC3_CACHE_DIR", "./data/hc3_dataset"))
 
 
 def download_hc3():
