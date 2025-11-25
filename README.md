@@ -22,21 +22,6 @@ A hybrid AI text detection system combining machine learning with information th
 
 Install [Docker](https://docs.docker.com/get-docker/) if you haven't already.
 
-```bash
-# Clone or navigate to the project directory
-cd verif
-
-# Start the application
-docker-compose up
-
-# Or run in detached mode
-docker-compose up -d
-```
-
-The application will be available at:
-- **Web UI**: http://localhost:8000
-- **API Docs**: http://localhost:8000/docs
-- **Health Check**: http://localhost:8000/health
 
 ### Run with Docker (Manual)
 
