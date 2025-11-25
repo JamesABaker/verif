@@ -18,8 +18,7 @@ ARG TORCH_INDEX_URL=https://download.pytorch.org/whl/cpu
 RUN uv venv && \
     . .venv/bin/activate && \
     uv pip install torch --index-url ${TORCH_INDEX_URL} && \
-    uv pip install -e . --no-deps && \
-    uv pip install transformers fastapi uvicorn pydantic python-multipart requests "numpy<2"
+    uv pip install -e .
 
 # Set environment variables to use venv
 ENV PATH=/app/.venv/bin:$PATH
