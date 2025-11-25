@@ -217,6 +217,12 @@
             margin-top: 3px;
         }
 
+        .metric-item.triggered {
+            background: #ff69b4;
+            border-width: 4px;
+            box-shadow: 2px 2px 0 #000;
+        }
+
         .prob-card {
             background: #fff;
             padding: 15px;
@@ -376,29 +382,22 @@ Example: The rapid advancement of artificial intelligence has transformed numero
 
         <div class="result" id="result">
             <h2 id="resultTitle"></h2>
-            <div class="probabilities">
-                <div class="prob-card">
-                    <div class="prob-label">No Signal</div>
-                    <div class="prob-value human" id="humanProb">0%</div>
-                </div>
-                <div class="prob-card">
-                    <div class="prob-label">AI-Generated Signal</div>
-                    <div class="prob-value ai" id="aiProb">0%</div>
-                </div>
-            </div>
 
             <div class="metrics">
-                <h3>📊 Analysis Details</h3>
+                <h3>📊 Detection Pathways</h3>
                 <div class="metric-grid">
-                    <div class="metric-item">
-                        <div class="metric-label">GPT 2 <a href="https://huggingface.co/Hello-SimpleAI/chatgpt-detector-roberta"
-                    target="_blank">RoBERTa</a></div>
+                    <div class="metric-item" id="robertaPathway">
+                        <div class="metric-label">🔍 RoBERTa (AI Patterns)</div>
                         <div class="metric-value" id="mlScore">0%</div>
                     </div>
-                    <div class="metric-item">
-                        <div class="metric-label">Entropy Score</div>
+                    <div class="metric-item" id="entropyPathway">
+                        <div class="metric-label">📈 Entropy (Statistical Perfection)</div>
                         <div class="metric-value" id="entropyScore">0%</div>
                     </div>
+                </div>
+
+                <h3 style="margin-top: 20px;">📉 Statistical Metrics</h3>
+                <div class="metric-grid">
                     <div class="metric-item">
                         <div class="metric-label">Perplexity</div>
                         <div class="metric-value" id="perplexity">0</div>
@@ -505,16 +504,26 @@ Example: The rapid advancement of artificial intelligence has transformed numero
         function displayResult(data) {
             const resultDiv = document.getElementById('result');
             const resultTitle = document.getElementById('resultTitle');
-            const humanProb = document.getElementById('humanProb');
-            const aiProb = document.getElementById('aiProb');
 
-            // Update main probabilities
-            humanProb.textContent = data.human_probability.toFixed(1) + '%';
-            aiProb.textContent = data.ai_probability.toFixed(1) + '%';
+            // Update pathway scores and highlight which triggered
+            const robertaPathway = document.getElementById('robertaPathway');
+            const entropyPathway = document.getElementById('entropyPathway');
 
-            // Update metrics
             document.getElementById('mlScore').textContent = data.ml_ai_probability.toFixed(1) + '% AI';
-            document.getElementById('entropyScore').textContent = data.entropy_ai_probability.toFixed(1) + '% AI';
+            document.getElementById('entropyScore').textContent = (100 - data.entropy_ai_probability).toFixed(1) + '% Perfect';
+
+            // Highlight triggered pathways
+            robertaPathway.classList.remove('triggered');
+            entropyPathway.classList.remove('triggered');
+
+            if (data.roberta_triggered) {
+                robertaPathway.classList.add('triggered');
+            }
+            if (data.entropy_triggered) {
+                entropyPathway.classList.add('triggered');
+            }
+
+            // Update statistical metrics
             document.getElementById('perplexity').textContent = data.perplexity.toFixed(1);
             document.getElementById('burstiness').textContent = data.burstiness.toFixed(3);
             document.getElementById('shannonEntropy').textContent = data.shannon_entropy.toFixed(3);
@@ -523,13 +532,13 @@ Example: The rapid advancement of artificial intelligence has transformed numero
             document.getElementById('punctDiversity').textContent = data.punctuation_diversity.toFixed(3);
             document.getElementById('vocabRichness').textContent = data.vocabulary_richness.toFixed(3);
 
-            // Set result class and title
+            // Set result class and title based on detection
             resultDiv.className = 'result ' + data.prediction;
 
             if (data.prediction === 'ai') {
-                resultTitle.textContent = '⚠️ AI-Generated';
+                resultTitle.textContent = '⚠️ AI Signal Detected';
             } else {
-                resultTitle.textContent = '✅ No AI Signal';
+                resultTitle.textContent = '✅ No AI Signal Detected';
             }
 
             // Show result

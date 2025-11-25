@@ -14,14 +14,14 @@ logger = logging.getLogger(__name__)
 
 
 class AIDetector:
-    """Hybrid AI detector combining ML model with entropy analysis."""
+    """Dual-pathway AI detector: RoBERTa + Entropy analysis."""
 
     def __init__(self, model_name: str = "Hello-SimpleAI/chatgpt-detector-roberta"):
         """
-        Initialize the hybrid AI detector.
+        Initialize the dual-pathway AI detector.
 
         Args:
-            model_name: Hugging Face model identifier for ML classifier
+            model_name: Hugging Face model identifier for RoBERTa classifier
         """
         logger.info(f"Loading ML model: {model_name}")
         self.model_name = model_name
@@ -32,23 +32,24 @@ class AIDetector:
 
         logger.info("Initializing entropy detector...")
         self.entropy_detector = EntropyDetector()
-        logger.info("Hybrid detector ready")
+        logger.info("Dual-pathway detector ready")
 
     def detect(self, text: str, max_length: int = 512) -> Dict[str, Any]:
         """
-        Hybrid detection combining ML model and entropy analysis.
+        Dual-pathway detection: RoBERTa for AI patterns + Entropy for statistical extremes.
+        Flags as AI if EITHER pathway exceeds its threshold.
 
         Args:
             text: Input text to analyze
             max_length: Maximum token length (default 512)
 
         Returns:
-            Dictionary with ML probabilities, entropy metrics, and hybrid score
+            Dictionary with both pathway scores and detection results
         """
         if not text or not text.strip():
             raise ValueError("Text cannot be empty")
 
-        # Get ML model predictions
+        # PATHWAY 1: RoBERTa - Detects AI-like linguistic patterns
         inputs = self.tokenizer(
             text, return_tensors="pt", truncation=True, max_length=max_length, padding=True
         )
@@ -59,26 +60,41 @@ class AIDetector:
             ml_human_prob = probs[0][0].item() * 100
             ml_ai_prob = probs[0][1].item() * 100
 
-        # Get entropy-based analysis
+        # PATHWAY 2: Entropy - Detects statistical extremes (too perfect OR too random)
         entropy_results = self.entropy_detector.detect(text)
 
-        # Hybrid score: weighted combination of ML and entropy
-        # Entropy features get 80% weight (more reliable for modern LLMs)
-        # ML model gets 20% weight (trained on old GPT-2 era data)
-        hybrid_ai_prob = 0.2 * ml_ai_prob + 0.8 * entropy_results["ai_probability_entropy"]
-        hybrid_human_prob = 100 - hybrid_ai_prob
+        # Independent thresholds for each pathway
+        ROBERTA_THRESHOLD = 50.0  # Flag if RoBERTa AI probability > 50%
 
-        prediction = "ai" if hybrid_ai_prob > 50 else "human"
+        # Determine which pathways triggered
+        roberta_triggered = ml_ai_prob > ROBERTA_THRESHOLD
+        entropy_triggered = (
+            entropy_results["human_probability_entropy"] > 90.0
+        )  # If human prob > 90% = too perfect
+
+        # Dual-gate logic: Flag as AI if EITHER pathway exceeds threshold
+        if roberta_triggered or entropy_triggered:
+            prediction = "ai"
+            # Use the higher confidence score for final probability
+            ai_probability = max(ml_ai_prob, entropy_results["ai_probability_entropy"])
+        else:
+            prediction = "human"
+            # Use the lower AI probability (higher human confidence)
+            ai_probability = min(ml_ai_prob, entropy_results["ai_probability_entropy"])
+
+        human_probability = 100 - ai_probability
 
         return {
-            # Hybrid final scores
-            "human_probability": round(hybrid_human_prob, 2),
-            "ai_probability": round(hybrid_ai_prob, 2),
+            # Final dual-gate results
+            "human_probability": round(human_probability, 2),
+            "ai_probability": round(ai_probability, 2),
             "prediction": prediction,
-            # ML model scores
+            "roberta_triggered": roberta_triggered,
+            "entropy_triggered": entropy_triggered,
+            # Pathway 1: RoBERTa scores
             "ml_human_probability": round(ml_human_prob, 2),
             "ml_ai_probability": round(ml_ai_prob, 2),
-            # Entropy metrics
+            # Pathway 2: Entropy metrics
             "perplexity": entropy_results["perplexity"],
             "shannon_entropy": entropy_results["shannon_entropy"],
             "burstiness": entropy_results["burstiness"],
@@ -86,17 +102,18 @@ class AIDetector:
             "word_length_variance": entropy_results["word_length_variance"],
             "punctuation_diversity": entropy_results["punctuation_diversity"],
             "vocabulary_richness": entropy_results["vocabulary_richness"],
-            # Individual entropy-based probability
             "entropy_ai_probability": entropy_results["ai_probability_entropy"],
             "entropy_human_probability": entropy_results["human_probability_entropy"],
         }
 
     def get_model_info(self) -> Dict[str, Any]:
-        """Get information about the hybrid detector."""
+        """Get information about the dual-pathway detector."""
         info: Dict[str, Any] = {
             "model_name": self.model_name,
-            "architecture": "Hybrid: RoBERTa + Entropy Analysis",
-            "ml_model": "RoBERTa-base",
+            "architecture": "Dual-Pathway: RoBERTa + Entropy Analysis",
+            "pathway_1": "RoBERTa - AI linguistic pattern detection",
+            "pathway_2": "Entropy - Statistical extremes detection",
+            "detection_logic": "Flag as AI if EITHER pathway exceeds threshold",
             "entropy_features": [
                 "perplexity",
                 "shannon_entropy",

@@ -24,3 +24,5 @@ dependencies:
   - pip
   - pip:
       - types-requests==2.31.0
+      - datasets==2.16.1
+      - tqdm==4.66.1

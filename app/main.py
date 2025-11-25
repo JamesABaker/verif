@@ -21,8 +21,10 @@ logger = logging.getLogger(__name__)
 # Initialize FastAPI app
 app = FastAPI(
     title="AI Text Detector API",
-    description="Ensemble analysis of ML and entropy-based methods to detect AI-generated text.",
-    version="2.0.0",
+    description=(
+        "Dual-pathway analysis: RoBERTa for AI patterns + " "Entropy for statistical extremes."
+    ),
+    version="3.0.0",
 )
 
 # Initialize model (singleton - loaded once at startup)
@@ -43,17 +45,21 @@ class DetectionRequest(BaseModel):
 class DetectionResponse(BaseModel):
     """Response model for detection results."""
 
-    # Final hybrid scores
+    # Final dual-gate results
     human_probability: float = Field(..., description="Probability text is human-written (0-100)")
     ai_probability: float = Field(..., description="Probability the text is AI-generated (0-100)")
     prediction: str = Field(..., description="Final prediction: 'human' or 'ai'")
     text_length: int = Field(..., description="Length of analyzed text in characters")
 
-    # ML model scores
-    ml_human_probability: float = Field(..., description="ML model human probability")
-    ml_ai_probability: float = Field(..., description="ML model AI probability")
+    # Detection pathway triggers
+    roberta_triggered: bool = Field(..., description="Whether RoBERTa pathway flagged as AI")
+    entropy_triggered: bool = Field(..., description="Whether Entropy pathway flagged as AI")
 
-    # Entropy metrics
+    # Pathway 1: RoBERTa scores
+    ml_human_probability: float = Field(..., description="RoBERTa pathway human probability")
+    ml_ai_probability: float = Field(..., description="RoBERTa pathway AI probability")
+
+    # Pathway 2: Entropy metrics
     perplexity: float = Field(..., description="Text perplexity score")
     shannon_entropy: float = Field(..., description="Shannon entropy of text")
     burstiness: float = Field(..., description="Sentence complexity variation (0-1)")
@@ -61,8 +67,8 @@ class DetectionResponse(BaseModel):
     word_length_variance: float = Field(..., description="Word length variance (0-1)")
     punctuation_diversity: float = Field(..., description="Punctuation diversity (0-1)")
     vocabulary_richness: float = Field(..., description="Vocabulary richness (0-1)")
-    entropy_ai_probability: float = Field(..., description="Entropy-based AI probability")
-    entropy_human_probability: float = Field(..., description="Entropy-based human probability")
+    entropy_ai_probability: float = Field(..., description="Entropy pathway AI probability")
+    entropy_human_probability: float = Field(..., description="Entropy pathway human probability")
 
 
 @app.on_event("startup")

@@ -90,6 +90,17 @@ curl http://localhost:8000/health
 
 Visit http://localhost:8000/docs for interactive API documentation with a built-in testing interface.
 
+## Evaluation
+
+To evaluate the detection system against the HC3 dataset (human vs ChatGPT text), first ensure the API is running, then build and run the evaluation Docker container:
+
+```bash
+docker build -f Dockerfile.eval -t verif-eval .
+docker run --network host verif-eval
+```
+
+This will test 1000 human and 1000 AI samples from the HC3 dataset and output accuracy metrics to `results.json`.
+
 ## Development
 
 ### Local Development Setup

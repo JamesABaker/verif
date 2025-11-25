@@ -233,6 +233,7 @@ class EntropyDetector:
     def detect(self, text: str) -> Dict[str, Any]:
         """
         Perform comprehensive entropy-based detection.
+        Detects statistical extremes - text that is either too perfect/uniform OR too random.
 
         Args:
             text: Input text to analyze
@@ -252,38 +253,82 @@ class EntropyDetector:
         punct_diversity = self.calculate_punctuation_diversity(text)
         vocab_richness = self.calculate_vocabulary_richness(text)
 
-        # Heuristic scoring (these thresholds are approximate and should be tuned)
-        # Lower perplexity = more AI-like (typical AI: 20-50, human: 50-200)
-        # Use clipped exp to prevent overflow
-        exp_arg = (perplexity - 50) / 20
-        exp_arg = max(min(exp_arg, 50), -50)  # Clip to prevent overflow
-        perplexity_score = 1.0 / (1.0 + math.exp(exp_arg))
+        # Define "normal human" ranges - flag if outside these bounds
+        # Each metric returns a score where 0 = within human range, 1 = outside (suspicious)
 
-        # Lower entropy = more AI-like
-        entropy_score = 1.0 - min(shannon_entropy / 5.0, 1.0)
+        # Perplexity: Human typical range 50-200
+        # Too low (< 30) = too perfect/predictable, Too high (> 250) = too random
+        if perplexity < 30:
+            perplexity_anomaly = (30 - perplexity) / 30  # Score how far below threshold
+        elif perplexity > 250:
+            perplexity_anomaly = min((perplexity - 250) / 250, 1.0)  # Score how far above
+        else:
+            perplexity_anomaly = 0.0  # Within normal range
 
-        # Lower burstiness = more AI-like
-        burstiness_score = 1.0 - burstiness
+        # Shannon entropy: Human typical range 3.5-4.8
+        # Too low = repetitive, Too high = random noise
+        if shannon_entropy < 3.5:
+            entropy_anomaly = (3.5 - shannon_entropy) / 3.5
+        elif shannon_entropy > 4.8:
+            entropy_anomaly = min((shannon_entropy - 4.8) / 4.8, 1.0)
+        else:
+            entropy_anomaly = 0.0
 
-        # Lower diversity = more AI-like
-        diversity_score = 1.0 - lexical_diversity
+        # Burstiness: Human typical range 0.3-0.8
+        # Too low = too uniform, Too high = chaotic
+        if burstiness < 0.3:
+            burstiness_anomaly = (0.3 - burstiness) / 0.3
+        elif burstiness > 0.8:
+            burstiness_anomaly = (burstiness - 0.8) / 0.2
+        else:
+            burstiness_anomaly = 0.0
 
-        # Lower word length variance = more AI-like
-        word_var_score = 1.0 - word_length_var
+        # Lexical diversity: Human typical range 0.4-0.8
+        # Too low = repetitive, Too high = forced variation
+        if lexical_diversity < 0.4:
+            diversity_anomaly = (0.4 - lexical_diversity) / 0.4
+        elif lexical_diversity > 0.8:
+            diversity_anomaly = (lexical_diversity - 0.8) / 0.2
+        else:
+            diversity_anomaly = 0.0
 
-        # Lower punctuation diversity = more AI-like
-        punct_score = 1.0 - punct_diversity
+        # Word length variance: Human typical range 0.3-0.7
+        if word_length_var < 0.3:
+            word_var_anomaly = (0.3 - word_length_var) / 0.3
+        elif word_length_var > 0.7:
+            word_var_anomaly = (word_length_var - 0.7) / 0.3
+        else:
+            word_var_anomaly = 0.0
 
-        # Weighted average - emphasizing the most reliable metrics
+        # Punctuation diversity: Human typical range 0.3-0.7
+        if punct_diversity < 0.3:
+            punct_anomaly = (0.3 - punct_diversity) / 0.3
+        elif punct_diversity > 0.7:
+            punct_anomaly = (punct_diversity - 0.7) / 0.3
+        else:
+            punct_anomaly = 0.0
+
+        # Vocabulary richness: Human typical range 0.4-0.8
+        if vocab_richness < 0.4:
+            vocab_anomaly = (0.4 - vocab_richness) / 0.4
+        elif vocab_richness > 0.8:
+            vocab_anomaly = (vocab_richness - 0.8) / 0.2
+        else:
+            vocab_anomaly = 0.0
+
+        # Aggregate anomaly score - weighted by metric reliability
         ai_probability = (
-            0.25 * perplexity_score  # Perplexity is very reliable
-            + 0.15 * burstiness_score  # Sentence variation is key
-            + 0.15 * (1.0 - vocab_richness)  # Yule's K is statistically robust
-            + 0.15 * diversity_score  # Type-token ratio
-            + 0.10 * word_var_score  # Word length patterns
-            + 0.10 * entropy_score  # Shannon entropy
-            + 0.10 * punct_score  # Punctuation usage
+            0.30 * perplexity_anomaly  # Most reliable for detecting extremes
+            + 0.20 * burstiness_anomaly  # Sentence variation extremes
+            + 0.15 * vocab_anomaly  # Vocabulary patterns
+            + 0.15 * diversity_anomaly  # Lexical diversity extremes
+            + 0.10 * entropy_anomaly  # Character entropy
+            + 0.05 * word_var_anomaly  # Word length patterns
+            + 0.05 * punct_anomaly  # Punctuation patterns
         )
+
+        # Cap at 1.0
+        ai_probability = min(ai_probability, 1.0)
 
         return {
             "perplexity": round(perplexity, 2),
