@@ -7,17 +7,29 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
 # Copy project files
 COPY pyproject.toml .
 COPY evaluation/evaluate.py .
 
-# Install dependencies with pip cache
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu && \
-    pip install -e ".[eval]"
+# Install dependencies with uv
+RUN uv venv && \
+    . .venv/bin/activate && \
+    uv pip install --no-binary :all: torch --index-url https://download.pytorch.org/whl/cpu && \
+    uv pip install -e ".[eval]"
+
+# Set environment to use venv
+ENV PATH=/evaluation/.venv/bin:$PATH
+ENV VIRTUAL_ENV=/evaluation/.venv
+
+# Create results directory
+RUN mkdir -p /evaluation/results
 
 # Set the API URL as environment variable (can be overridden)
 ENV API_URL=http://host.docker.internal:8000/api/detect
+ENV HC3_CACHE_DIR=/data/hc3_dataset
 
 # Run evaluation
 CMD ["python", "evaluate.py"]

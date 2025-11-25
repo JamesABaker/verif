@@ -136,10 +136,38 @@ def create_violin_plots(human_metrics, ai_metrics, analysis):
 
 
 def main():
+    import os
+
     # Load HC3 dataset
     print("Loading HC3 dataset...")
-    # HC3 requires trust_remote_code for custom loading script
-    dataset = load_dataset("Hello-SimpleAI/HC3", "all", split="train", trust_remote_code=True)
+
+    # Check for locally cached dataset first
+    cache_dir = os.getenv("HC3_CACHE_DIR", "/data/hc3_dataset")
+
+    try:
+        # Try loading from local cache first
+        dataset = load_dataset(
+            "Hello-SimpleAI/HC3",
+            "default",
+            split="train",
+            revision="refs/convert/parquet",
+            cache_dir=cache_dir,
+        )
+        print(f"✓ Loaded HC3 dataset from cache: {cache_dir}")
+    except Exception as e:
+        print(f"Warning: Could not load from cache: {e}")
+        print("Attempting to download fresh copy...")
+        try:
+            dataset = load_dataset(
+                "Hello-SimpleAI/HC3",
+                "default",
+                split="train",
+                revision="refs/convert/parquet",
+            )
+            print("✓ Downloaded HC3 dataset successfully")
+        except Exception as e2:
+            print(f"✗ Failed to load HC3 dataset: {e2}")
+            raise
 
     human_texts = []
     ai_texts = []

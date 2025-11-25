@@ -24,6 +24,23 @@ services:
       retries: 3
       start_period: 40s
 
+  verif-eval:
+    build:
+      context: .
+      dockerfile: Dockerfile.eval
+    container_name: verif-eval
+    depends_on:
+      - verif
+    volumes:
+      # Cache HC3 dataset locally (1TB available)
+      - hc3-cache:/data/hc3_dataset
+      # Output results to local directory
+      - ./evaluation/results:/evaluation/results
+    environment:
+      - HC3_CACHE_DIR=/data/hc3_dataset
+      - API_URL=http://verif:8000/api/detect
+    network_mode: host
+
 volumes:
   model-cache:
     driver: local

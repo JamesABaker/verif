@@ -1,21 +1,24 @@
-# Use conda base image
-FROM continuumio/miniconda3:24.7.1-0
+# Use Python slim image
+FROM python:3.11-slim
+
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 # Set working directory
 WORKDIR /app
 
-# Copy environment file
-COPY environment.yml .
-
-# Create conda environment
-RUN conda env create -f environment.yml && \
-    conda clean -afy
-
-# Copy application code
+# Copy project files
+COPY pyproject.toml .
 COPY app/ ./app/
 
-# Activate environment and set path
-ENV PATH=/opt/conda/envs/verif/bin:$PATH
+# Install dependencies with uv
+RUN uv venv && \
+    . .venv/bin/activate && \
+    uv pip install -e .
+
+# Set environment variables to use venv
+ENV PATH=/app/.venv/bin:$PATH
+ENV VIRTUAL_ENV=/app/.venv
 
 # Pre-download the model during build to avoid startup delays
 RUN python -c "from transformers import AutoTokenizer, AutoModelForSequenceClassification; \

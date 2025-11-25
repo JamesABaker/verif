@@ -46,3 +46,10 @@ models/
 
 # Logs
 *.log
+
+# Evaluation data
+data/
+
+# TODO and other local work files
+*.todo
+TODO.md

@@ -95,8 +95,12 @@ Visit http://localhost:8000/docs for interactive API documentation with a built-
 To evaluate the detection system against the HC3 dataset (human vs ChatGPT text), first ensure the API is running, then build and run the evaluation Docker container:
 
 ```bash
+# Download the dataset once (this caches it locally in /data/hc3_dataset)
+python scripts/download_hc3.py
+
+# Then run evaluation
 docker build -f Dockerfile.eval -t verif-eval .
-docker run --network host verif-eval
+docker run --network host -v hc3-cache:/data/hc3_dataset -e HC3_CACHE_DIR=/data/hc3_dataset verif-eval
 ```
 
 This will test 1000 human and 1000 AI samples from the HC3 dataset and output accuracy metrics to `results.json`.
@@ -105,16 +109,35 @@ This will test 1000 human and 1000 AI samples from the HC3 dataset and output ac
 
 ### Local Development Setup
 
-**Using Conda**
-```bash
-# Create conda environment
-conda env create -f environment.yml
+We use [uv](https://docs.astral.sh/uv/) for dependency management.
 
-# Activate environment
-conda activate verif
+**Quick Start:**
+
+```bash
+# Create a virtual environment and install all dependencies
+uv sync --all-extras
+
+# Activate the virtual environment
+source .venv/bin/activate
 
 # Install pre-commit hooks
 pre-commit install
+```
+
+**Selective Installation:**
+
+```bash
+# Just app dependencies (no dev or eval)
+uv sync
+
+# App + dev dependencies
+uv sync --extra dev
+
+# App + eval dependencies
+uv sync --extra eval
+
+# All dependencies
+uv sync --all-extras
 ```
 
 ## Model Information
