@@ -27,10 +27,10 @@ Install [Docker](https://docs.docker.com/get-docker/) if you haven't already.
 cd verif
 
 # Start the application
-docker-compose up
+docker compose up
 
 # Or run in detached mode
-docker-compose up -d
+docker compose up -d
 ```
 
 The application will be available at:
@@ -94,42 +94,7 @@ Visit http://localhost:8000/docs for interactive API documentation with a built-
 
 ### Local Development Setup
 
-**Using uv (recommended):**
-
-```bash
-# Create a virtual environment and install dependencies
-uv venv
-source .venv/bin/activate
-
-# Install CPU-only PyTorch (smaller, faster)
-uv pip install torch --index-url https://download.pytorch.org/whl/cpu
-
-# Install app dependencies
-uv pip install -e .
-
-# Install dev dependencies (optional)
-uv pip install -e ".[dev]"
-
-# Install pre-commit hooks
-pre-commit install
-```
-
-**Database Setup (PostgreSQL):**
-
-```bash
-# Start PostgreSQL with Docker
-docker-compose -f docker-compose.dev.yml up -d db
-
-# Or install PostgreSQL locally
-# Ubuntu: sudo apt install postgresql
-# macOS: brew install postgresql
-
-# Set database URL environment variable
-export DATABASE_URL=postgresql://verif:verif_dev_password@localhost:5432/verif
-```
-
-**Legacy conda setup:**
-
+**Using Conda**
 ```bash
 # Create conda environment
 conda env create -f environment.yml

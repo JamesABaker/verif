@@ -34,6 +34,20 @@ repos:
       - id: check-merge-conflict
       - id: check-toml
       - id: detect-private-key
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: forbid-new-submodules
+      - id: no-commit-to-branch
+        args: ['--branch', 'main']
+
+  # Prevent .env files from being committed
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+        name: prevent .env from being committed
+        args: ['--maxkb=0']
+        files: '^\.env$'
 
   # Dockerfile linting
   - repo: https://github.com/hadolint/hadolint

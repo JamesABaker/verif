@@ -1,27 +1,15 @@
 # User Account Setup Guide
 
-This guide explains how to set up OAuth authentication with Google and GitHub.
+This guide explains how to set up OAuth authentication with GitHub for local testing and development.
 
 ## Prerequisites
 
 - Docker and Docker Compose installed
-- Google Cloud Platform account (for Google OAuth)
 - GitHub account (for GitHub OAuth)
 
 ## Setup Steps
 
 ### 1. Configure OAuth Providers
-
-#### Google OAuth Setup
-
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select existing one
-3. Navigate to "APIs & Services" > "Credentials"
-4. Click "Create Credentials" > "OAuth 2.0 Client ID"
-5. Configure consent screen if prompted
-6. Set application type to "Web application"
-7. Add authorized redirect URI: `http://localhost:8000/auth/callback`
-8. Copy the Client ID and Client Secret
 
 #### GitHub OAuth Setup
 
@@ -46,8 +34,6 @@ cp .env.example .env
 Edit `.env` and add your OAuth credentials:
 
 ```env
-GOOGLE_CLIENT_ID=your-actual-google-client-id
-GOOGLE_CLIENT_SECRET=your-actual-google-secret
 GITHUB_CLIENT_ID=your-actual-github-client-id
 GITHUB_CLIENT_SECRET=your-actual-github-secret
 JWT_SECRET_KEY=generate-a-random-secret-key-here
@@ -62,7 +48,7 @@ python -c "import secrets; print(secrets.token_urlsafe(32))"
 ### 3. Start the Application
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 The application will:
@@ -71,14 +57,6 @@ The application will:
 - Start the FastAPI application on port 8000
 
 ### 4. Test Authentication
-
-#### Option 1: Google Login
-
-1. Navigate to: `http://localhost:8000/auth/login/google`
-2. Authorize with your Google account
-3. You'll receive JWT tokens in the response
-
-#### Option 2: GitHub Login
 
 1. Navigate to: `http://localhost:8000/auth/login/github`
 2. Authorize with your GitHub account
@@ -175,7 +153,7 @@ Ensure the redirect URI in your OAuth app settings exactly matches:
 
 Check that PostgreSQL is running:
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 ### Token Validation Failed
