@@ -119,6 +119,20 @@ def about():
         )
 
 
+@app.get("/tos", response_class=HTMLResponse)
+def tos():
+    """Serve the terms of service page."""
+    html_path = os.path.join(os.path.dirname(__file__), "static", "tos.html")
+    try:
+        with open(html_path, "r") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse(
+            content="<h1>TOS not found</h1><p>Please ensure static/tos.html exists.</p>",
+            status_code=404,
+        )
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""
