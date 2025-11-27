@@ -27,26 +27,13 @@ Install [Docker](https://docs.docker.com/get-docker/) if you haven't already.
 cd verif
 
 # Start the application
-docker compose up
-
-# Or run in detached mode
-docker compose up -d
+docker compose up --build
 ```
 
 The application will be available at:
 - **Web UI**: http://localhost:8000
 - **API Docs**: http://localhost:8000/docs
 - **Health Check**: http://localhost:8000/health
-
-### Run with Docker (Manual)
-
-```bash
-# Build the image
-docker build -t verif .
-
-# Run the container
-docker run -p 8000:8000 verif
-```
 
 ## Usage
 
@@ -56,35 +43,6 @@ docker run -p 8000:8000 verif
 2. Paste or type text into the textarea
 3. Click "Detect AI"
 4. View the results
-
-### REST API
-
-**Detect Text:**
-```bash
-curl -X POST http://localhost:8000/api/detect \
-  -H "Content-Type: application/json" \
-  -d '{"text": "Your text to analyze here..."}'
-```
-
-**Response:**
-```json
-{
-  "human_probability": 45.3,
-  "ai_probability": 54.7,
-  "prediction": "ai",
-  "text_length": 123
-}
-```
-
-**Get Model Info:**
-```bash
-curl http://localhost:8000/api/model-info
-```
-
-**Health Check:**
-```bash
-curl http://localhost:8000/health
-```
 
 ### Interactive API Documentation
 
@@ -120,10 +78,10 @@ pre-commit install
 
 - [ ] Batch processing API endpoint
 - [ ] API rate limiting
-- [ ] User 2fa authentication
+- [x] User 2fa authentication
 - [ ] Method refinement
 - [ ] Deployment
-- [ ] Volume data persistence for users
+- [x] Volume data persistence for users
 
 
 ## License

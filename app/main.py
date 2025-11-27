@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.database import Base, engine, get_db
 from app.dependencies import get_current_user, get_current_user_optional
-from app.model import AIDetector
+from app.ml_model import AIDetector
 from app.models import Result, User
 from app.routes import auth as auth_routes
 
