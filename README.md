@@ -23,10 +23,8 @@
 Install [Docker](https://docs.docker.com/get-docker/) if you haven't already.
 
 ```bash
-# Clone or navigate to the project directory
-cd verif
-
-# Start the application
+git clone https://github.com/JamesABaker/joseph.git
+cd joseph
 docker compose up --build
 ```
 
