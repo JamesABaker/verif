@@ -3,9 +3,9 @@
 [![Docker Build](https://github.com/JamesABaker/verif/actions/workflows/docker.yml/badge.svg)](https://github.com/JamesABaker/verif/actions/workflows/docker.yml)
 [![pre-commit](https://github.com/JamesABaker/verif/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/JamesABaker/verif/actions/workflows/pre-commit.yml)
 
-> *"There are simply too many notes."* — Emperor Joseph II to Mozart
+> *"Too many notes."* — Emperor Joseph II to Mozart
 
-**Joseph** is a hybrid AI text detection system combining machine learning with information theory. Named after Emperor Joseph II, who might have told Mozart his music had "too many notes"—a reminder that something trying to be too perfect can be detected.
+**Joseph** is a hybrid AI text detection system combining machine learning with information theory.
 
 ## Features
 
