@@ -11,7 +11,9 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 COPY pyproject.toml .
 
 # Install dependencies (production only, no training deps)
-RUN uv pip install --system --no-cache .
+# Install PyTorch CPU-only first to avoid CUDA dependencies
+RUN uv pip install --system --no-cache torch --index-url https://download.pytorch.org/whl/cpu && \
+    uv pip install --system --no-cache .
 
 # Copy application code
 COPY app/ ./app/
