@@ -904,7 +904,7 @@ Example: The rapid advancement of artificial intelligence has transformed numero
             const aiSignal = document.getElementById('aiSignal');
 
             // Update AI signal score (0-100 scale)
-            aiSignal.textContent = data.ai_probability.toFixed(1);
+            aiSignal.textContent = data.ai_probability.toFixed(1) + '%';
 
             // Update metrics
             document.getElementById('mlScore').textContent = data.ml_ai_probability.toFixed(1) + '% AI';
