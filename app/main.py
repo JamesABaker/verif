@@ -2,6 +2,7 @@
 FastAPI application for AI text detection.
 Serves both REST API and web UI.
 """
+
 import logging
 import os
 from typing import Optional
@@ -245,9 +246,9 @@ async def get_user_results(
         "results": [
             {
                 "id": r.id,
-                "text_analyzed": r.text_analyzed[:100] + "..."
-                if len(r.text_analyzed) > 100
-                else r.text_analyzed,
+                "text_analyzed": (
+                    r.text_analyzed[:100] + "..." if len(r.text_analyzed) > 100 else r.text_analyzed
+                ),
                 "human_probability": r.human_probability,
                 "ai_probability": r.ai_probability,
                 "prediction": r.prediction,

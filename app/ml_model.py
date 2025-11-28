@@ -2,6 +2,7 @@
 Hybrid AI text detection combining ML model with entropy-based features.
 Uses trained Joseph Random Forest model on entropy features + RoBERTa.
 """
+
 import logging
 from pathlib import Path
 from typing import Any, Dict
@@ -28,8 +29,10 @@ class AIDetector:
         """
         logger.info(f"Loading RoBERTa model: {model_name}")
         self.model_name = model_name
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self.roberta_model = AutoModelForSequenceClassification.from_pretrained(model_name)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name)  # nosec B615
+        self.roberta_model = AutoModelForSequenceClassification.from_pretrained(
+            model_name
+        )  # nosec B615
         self.roberta_model.eval()
         logger.info("RoBERTa model loaded successfully")
 

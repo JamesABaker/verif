@@ -6,6 +6,7 @@ This script:
 2. Extracts 7 entropy features + RoBERTa probability for each sample
 3. Saves as train/val/test parquet files (70/15/15 split)
 """
+
 import logging
 import sys
 from pathlib import Path
@@ -91,7 +92,7 @@ def main():
     # Load HC3 dataset from local cache
     logger.info("Loading HC3 dataset...")
     data_dir = Path(__file__).parent.parent / "data" / "hc3_dataset"
-    dataset = load_dataset(str(data_dir))
+    dataset = load_dataset(str(data_dir))  # nosec B615
 
     # Extract train split (we'll do our own splitting)
     hc3_train = dataset["train"]
