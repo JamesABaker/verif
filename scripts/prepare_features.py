@@ -24,43 +24,62 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger(__name__)
 
 
-def extract_features(texts, labels, detector, desc="Processing"):
+def extract_features_batch(texts, labels, detector, desc="Processing", batch_size=32):
     """
-    Extract features from texts using entropy detector and RoBERTa.
+    Extract features from texts using entropy detector and RoBERTa with batching.
 
     Args:
         texts: List of text samples
         labels: List of labels (0=human, 1=ai)
         detector: AIDetector instance
         desc: Progress bar description
+        batch_size: Number of texts to process at once for RoBERTa
 
     Returns:
         DataFrame with features and labels
     """
+    import torch
+
     features_list = []
 
-    for text, label in tqdm(zip(texts, labels), total=len(texts), desc=desc):
-        try:
-            # Get full detection results (includes entropy + RoBERTa)
-            result = detector.detect(text)
+    # Process in batches for RoBERTa efficiency
+    for i in tqdm(range(0, len(texts), batch_size), desc=desc):
+        batch_texts = texts[i : i + batch_size]
+        batch_labels = labels[i : i + batch_size]
 
-            # Extract the 8 features we want
-            features = {
-                "perplexity": result["perplexity"],
-                "shannon_entropy": result["shannon_entropy"],
-                "burstiness": result["burstiness"],
-                "lexical_diversity": result["lexical_diversity"],
-                "word_length_variance": result["word_length_variance"],
-                "punctuation_diversity": result["punctuation_diversity"],
-                "vocabulary_richness": result["vocabulary_richness"],
-                "roberta_ai_prob": result["ml_ai_probability"],  # RoBERTa as 8th feature
-                "label": label,  # 0=human, 1=ai
-            }
-            features_list.append(features)
+        # Batch RoBERTa inference
+        inputs = detector.tokenizer(
+            batch_texts, return_tensors="pt", truncation=True, max_length=512, padding=True
+        )
 
-        except Exception as e:
-            logger.warning(f"Failed to process sample (label={label}): {e}")
-            continue
+        with torch.no_grad():
+            outputs = detector.roberta_model(**inputs)
+            probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
+            roberta_ai_probs = probs[:, 1].cpu().numpy() * 100
+
+        # Process entropy features individually (can't be easily batched)
+        for j, (text, label) in enumerate(zip(batch_texts, batch_labels)):
+            try:
+                # Get entropy features
+                entropy_results = detector.entropy_detector.detect(text)
+
+                # Extract the 8 features we want
+                features = {
+                    "perplexity": entropy_results["perplexity"],
+                    "shannon_entropy": entropy_results["shannon_entropy"],
+                    "burstiness": entropy_results["burstiness"],
+                    "lexical_diversity": entropy_results["lexical_diversity"],
+                    "word_length_variance": entropy_results["word_length_variance"],
+                    "punctuation_diversity": entropy_results["punctuation_diversity"],
+                    "vocabulary_richness": entropy_results["vocabulary_richness"],
+                    "roberta_ai_prob": roberta_ai_probs[j],
+                    "label": label,  # 0=human, 1=ai
+                }
+                features_list.append(features)
+
+            except Exception as e:
+                logger.warning(f"Failed to process sample (label={label}): {e}")
+                continue
 
     return pd.DataFrame(features_list)
 
@@ -69,9 +88,10 @@ def main():
     """Main feature extraction pipeline."""
     logger.info("Starting feature extraction from HC3 dataset")
 
-    # Load HC3 dataset
+    # Load HC3 dataset from local cache
     logger.info("Loading HC3 dataset...")
-    dataset = load_dataset("Hello-SimpleAI/HC3", "all")
+    data_dir = Path(__file__).parent.parent / "data" / "hc3_dataset"
+    dataset = load_dataset(str(data_dir))
 
     # Extract train split (we'll do our own splitting)
     hc3_train = dataset["train"]
@@ -120,13 +140,15 @@ def main():
 
     # Extract features for each split
     logger.info("Extracting features from training set...")
-    train_df = extract_features(train_texts, train_labels, detector, "Train set")
+    train_df = extract_features_batch(
+        train_texts, train_labels, detector, "Train set", batch_size=32
+    )
 
     logger.info("Extracting features from validation set...")
-    val_df = extract_features(val_texts, val_labels, detector, "Val set")
+    val_df = extract_features_batch(val_texts, val_labels, detector, "Val set", batch_size=32)
 
     logger.info("Extracting features from test set...")
-    test_df = extract_features(test_texts, test_labels, detector, "Test set")
+    test_df = extract_features_batch(test_texts, test_labels, detector, "Test set", batch_size=32)
 
     # Save to parquet
     output_dir = Path(__file__).parent.parent / "data" / "joseph_training"

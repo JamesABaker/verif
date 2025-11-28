@@ -17,18 +17,14 @@ Instead of a hand-tuned weighted combination, we train a Random Forest classifie
 Install training dependencies:
 
 ```bash
-# Using uv (recommended - blazing fast)
 uv pip install -e ".[training]"
-
-# Or using pip
-pip install -e ".[training]"
 ```
 
 This installs scikit-learn, pandas, datasets, tqdm, and pyarrow.
 
 ### Step 1: Extract Features
 ```bash
-python scripts/prepare_features.py
+uv run python scripts/prepare_features.py
 ```
 
 **What it does:**
@@ -41,7 +37,7 @@ python scripts/prepare_features.py
 
 ### Step 2: Train Model
 ```bash
-python scripts/train_joseph_model.py
+uv run python scripts/train_joseph_model.py
 ```
 
 **What it does:**
@@ -55,7 +51,7 @@ python scripts/train_joseph_model.py
 
 ### Step 3: Evaluate on Test Set
 ```bash
-python scripts/evaluate_model.py
+uv run python scripts/evaluate_model.py
 ```
 
 **What it does:**
@@ -123,9 +119,9 @@ To train locally:
 uv pip install -e ".[training]"
 
 # Run training pipeline
-python scripts/prepare_features.py
-python scripts/train_joseph_model.py
-python scripts/evaluate_model.py
+uv run python scripts/prepare_features.py
+uv run python scripts/train_joseph_model.py
+uv run python scripts/evaluate_model.py
 ```
 
 The trained `models/joseph_v1.pkl` is automatically loaded by the app.
