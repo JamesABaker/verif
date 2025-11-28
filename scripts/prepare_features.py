@@ -138,17 +138,17 @@ def main():
     logger.info("Initializing AIDetector (this will download models on first run)...")
     detector = AIDetector()
 
-    # Extract features for each split
+    # Extract features for each split using larger batches (you have 31GB RAM!)
     logger.info("Extracting features from training set...")
     train_df = extract_features_batch(
-        train_texts, train_labels, detector, "Train set", batch_size=32
+        train_texts, train_labels, detector, "Train set", batch_size=128
     )
 
     logger.info("Extracting features from validation set...")
-    val_df = extract_features_batch(val_texts, val_labels, detector, "Val set", batch_size=32)
+    val_df = extract_features_batch(val_texts, val_labels, detector, "Val set", batch_size=128)
 
     logger.info("Extracting features from test set...")
-    test_df = extract_features_batch(test_texts, test_labels, detector, "Test set", batch_size=32)
+    test_df = extract_features_batch(test_texts, test_labels, detector, "Test set", batch_size=128)
 
     # Save to parquet
     output_dir = Path(__file__).parent.parent / "data" / "joseph_training"

@@ -16,6 +16,9 @@ RUN uv pip install --system -r pyproject.toml
 # Copy application code
 COPY app/ ./app/
 
+# Copy trained Joseph model
+COPY models/ ./models/
+
 # Pre-download the model during build to avoid startup delays
 RUN python -c "from transformers import AutoTokenizer, AutoModelForSequenceClassification; \
     AutoTokenizer.from_pretrained('Hello-SimpleAI/chatgpt-detector-roberta'); \
