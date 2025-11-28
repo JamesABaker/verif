@@ -138,34 +138,35 @@ def main():
     logger.info("Initializing AIDetector (this will download models on first run)...")
     detector = AIDetector()
 
-    # Extract features for each split using larger batches (you have 31GB RAM!)
+    # Setup output directory
+    output_dir = Path(__file__).parent.parent / "data" / "joseph_training"
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    # Extract and save training set (with checkpoint)
     logger.info("Extracting features from training set...")
     train_df = extract_features_batch(
         train_texts, train_labels, detector, "Train set", batch_size=128
     )
-
-    logger.info("Extracting features from validation set...")
-    val_df = extract_features_batch(val_texts, val_labels, detector, "Val set", batch_size=128)
-
-    logger.info("Extracting features from test set...")
-    test_df = extract_features_batch(test_texts, test_labels, detector, "Test set", batch_size=128)
-
-    # Save to parquet
-    output_dir = Path(__file__).parent.parent / "data" / "joseph_training"
-    output_dir.mkdir(parents=True, exist_ok=True)
-
     train_path = output_dir / "train.parquet"
-    val_path = output_dir / "val.parquet"
-    test_path = output_dir / "test.parquet"
-
     logger.info(f"Saving training features to {train_path}")
     train_df.to_parquet(train_path, index=False)
+    logger.info(f"✓ Training set saved! ({len(train_df)} samples)")
 
+    # Extract and save validation set (with checkpoint)
+    logger.info("Extracting features from validation set...")
+    val_df = extract_features_batch(val_texts, val_labels, detector, "Val set", batch_size=128)
+    val_path = output_dir / "val.parquet"
     logger.info(f"Saving validation features to {val_path}")
     val_df.to_parquet(val_path, index=False)
+    logger.info(f"✓ Validation set saved! ({len(val_df)} samples)")
 
+    # Extract and save test set (with checkpoint)
+    logger.info("Extracting features from test set...")
+    test_df = extract_features_batch(test_texts, test_labels, detector, "Test set", batch_size=128)
+    test_path = output_dir / "test.parquet"
     logger.info(f"Saving test features to {test_path}")
     test_df.to_parquet(test_path, index=False)
+    logger.info(f"✓ Test set saved! ({len(test_df)} samples)")
 
     # Print summary statistics
     logger.info("\n" + "=" * 60)
